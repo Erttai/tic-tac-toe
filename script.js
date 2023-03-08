@@ -1,68 +1,87 @@
 "use strict";
 
-const playerOne = {
-  name: "luciano",
-  selection: [],
-};
-
-const playerTwo = {
-  name: "Jorge",
-  selection: [],
-};
-
 const gameBoard = (() => {
+  const players = [{ name: "playerOne" }, { name: "playerTwo" }];
   const grid = document.querySelector(".grid");
-  let arr = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-
+  const resetBtn = document.querySelector(".reset");
+  let board = Array.from(Array(9).keys());
+  console.log(board);
   let squares = [];
+  let activePlayer = players[0];
+
+  const winCombos = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [6, 4, 2],
+  ];
+
   function _renderBoard() {
-    arr.forEach(i => {
+    board.forEach(i => {
       const div = document.createElement("div");
-      div.setAttribute("id", i);
-      div.textContent = i;
+      div.setAttribute("id", Number(i));
+      div.textContent = "";
       grid.append(div);
       squares.push(div);
     });
   }
   _renderBoard();
 
-  // function _passTurn(playerTurn) {
-  //   if (playerTurn === 1) {
-  //     playerTurn = 2;
-  //   }
-  // }
+  squares.forEach(el => {
+    el.addEventListener("click", turnClick);
+  });
 
-  let playerTurn = 1;
-  function _displaySelection(e) {
-    const square = e.target.id;
-    if (
-      playerTurn === 1 &&
-      !playerOne.selection.includes(square) &&
-      !playerTwo.selection.includes(square)
-    ) {
-      playerOne.selection.push(square);
-      this.textContent = "X";
-      playerTurn = 2;
+  function turnClick(square) {
+    displaySelection(square.target.id, activePlayer);
+  }
 
-      console.log(playerOne.selection);
-    } else if (
-      playerTurn === 2 &&
-      !playerTwo.selection.includes(square) &&
-      !playerOne.selection.includes(square)
-    ) {
-      playerTwo.selection.push(square);
-      this.textContent = "O";
-      playerTurn = 1;
-      console.log(playerTwo.selection);
+  const switchPlayerTurn = () => {
+    activePlayer = activePlayer === players[0] ? players[1] : players[0];
+  };
+
+  function displaySelection(squareId, activePlayer) {
+    if (!gameWon) {
+      if (typeof board[squareId] === "number") {
+        board[squareId] = activePlayer.name;
+
+        document.getElementById(squareId).textContent =
+          activePlayer === players[0] ? "X" : "O";
+        checkWin(activePlayer, board);
+        gameWon ? gameOver(gameWon) : switchPlayerTurn();
+      }
     }
   }
 
-  squares.forEach(el => {
-    el.addEventListener("click", _displaySelection);
-  });
+  let gameWon = null;
+  function checkWin(player, board) {
+    for (const element of winCombos.values()) {
+      if (element.every(ele => board[ele] === player.name)) {
+        gameWon = { element, player };
+        break;
+      }
+    }
+    return gameWon;
+  }
 
-  return {
-    squares,
-    playerTurn,
+  function gameOver(gameWon) {
+    for (const element of gameWon.element.values()) {
+      document.getElementById(element).classList.add("winner");
+    }
+  }
+
+  const reset = () => {
+    board = Array.from(Array(9).keys());
+    gameWon = null;
+    squares.forEach(element => {
+      element.textContent = "";
+      element.classList.remove("winner");
+    });
+    activePlayer = players[0];
   };
+
+  resetBtn.addEventListener("click", reset);
 })();

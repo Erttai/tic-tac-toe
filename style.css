@@ -14,8 +14,10 @@ body {
   min-height: 100vh;
   padding: 1em;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 30px;
 }
 
 .grid {
@@ -23,16 +25,29 @@ body {
   height: 300px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  border: none;
 }
 
 .grid > div {
   width: 100px;
   height: 100px;
-  border: 3px solid black;
+  border: 1px solid black;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 2rem;
   font-weight: 700;
   cursor: pointer;
+}
+
+.winner {
+  background-color: red;
+}
+
+.btn {
+  cursor: pointer;
+  border-radius: 15px;
+  border: 3px solid black;
+  padding: 0.5em 2em;
+  text-transform: uppercase;
 }
